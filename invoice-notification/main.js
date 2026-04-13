@@ -11,6 +11,9 @@ function sendInvoiceNotifications() {
   // スプレッドシートからデータを取得
   const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
     .getSheetByName(CONFIG.SHEET_NAME);
+  if (!sheet) {
+    throw new Error(`シート "${CONFIG.SHEET_NAME}" が見つかりません。SHEET_NAME を確認してください。`);
+  }
   const data = sheet.getDataRange().getValues();
 
   // ヘッダー行からカラムインデックスを構築
@@ -40,9 +43,13 @@ function sendInvoiceNotifications() {
       ? `${customerName}様への請求予定日当日です`
       : `${customerName}様への請求予定日まであと${daysDiff}日`;
 
+    // 受注日のフォーマット（無効な日付は「未設定」と表示）
+    const orderDate = new Date(row[col.ORDER_DATE]);
+    const orderDateStr = isNaN(orderDate.getTime()) ? '未設定' : formatDateJP(orderDate);
+
     // メール本文を作成
     const body = `取引先名: ${customerName}
-受注日: ${formatDateJP(row[col.ORDER_DATE])}
+受注日: ${orderDateStr}
 注文番号: ${row[col.ORDER_NUMBER]}
 
 請求予定日: ${formatDateJP(invoiceDate)}

@@ -51,7 +51,11 @@ function formatDateJP(date) {
 function buildColumnIndices(headers, columnMap) {
   const indices = {};
   for (const [key, headerName] of Object.entries(columnMap)) {
-    indices[key] = headers.indexOf(headerName);
+    const index = headers.indexOf(headerName);
+    if (index === -1) {
+      console.warn(`カラム "${headerName}"（キー: ${key}）がヘッダー行に見つかりません`);
+    }
+    indices[key] = index;
   }
   return indices;
 }
