@@ -158,3 +158,13 @@ main@abc1234 2026-04-13 10:30 コミットメッセージ
 ```
 
 Apps Script のバージョン管理画面からどのコミットに対応するかを特定でき、運用時のトラブルシューティングに役立ちます。
+
+## Author
+
+[杉岡システム株式会社](https://www.sugiokasystem.co.jp)
+[公式ブログ](https://www.sugiokasystem.co.jp/blog)の記事に関連するサンプルコードを公開しています。
+
+[Sugioka System Co., Ltd.](https://www.sugiokasystem.co.jp)
+Sample code repository for articles on our [official blog](https://www.sugiokasystem.co.jp/blog).
+
+※本リポジトリは執筆担当者のGitHubアカウントで公開しています。
