@@ -5,7 +5,7 @@
  * メニューから通知のテスト送信やトリガーの設定・削除を実行できる。
  *
  * ■ 関数一覧
- *   onOpen()                — 「請求通知」メニューを登録（Simple Trigger）
+ *   onOpen()                — 「通知管理」メニューを登録（Simple Trigger）
  *   runManualNotification() — 手動でメール通知を実行（完了ダイアログ表示）
  *   showTriggerStatus()     — 設定済みトリガーの一覧を表示
  */
