@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# npm
+package.json
+package-lock.json
+
+# clasp
+.clasp.json.example
+
+# Credentials
+creds.json
+key/
+
+# Documentation
+README.md
+CLAUDE.md
+
+# Sample data (GAS にアップロード不要)
+sample-data.csv

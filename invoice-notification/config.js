@@ -23,14 +23,14 @@ const CONFIG = {
   // ─── カラム名マッピング（スプレッドシートのヘッダー名） ───
   COLUMNS: {
     CUSTOMER_NAME: '取引先名',
+    ORDER_DATE: '受注日',
+    ORDER_NUMBER: '注文番号',
     ITEM_NAME: '品名',
     UNIT_PRICE: '単価(税抜)',
     QUANTITY: '数量',
     PRICE: '小計(税抜)',
-    TOTAL_AMOUNT: '合計(税込)',
+    TAX: '税率',
     INVOICE_DATE: '請求予定日',
     INVOICE_NUMBER: '請求番号',
-    ORDER_DATE: '受注日',
-    ORDER_NUMBER: '注文番号',
   },
 };

@@ -31,6 +31,16 @@ function formatJPY(amount) {
 }
 
 /**
+ * 金額の端数処理（デフォルト: 切り捨て）
+ *
+ * 切り上げにする場合:  return Math.ceil(amount);
+ * 四捨五入にする場合:  return Math.round(amount);
+ */
+function roundAmount(amount) {
+  return Math.floor(amount);
+}
+
+/**
  * Date オブジェクトを「yyyy年m月d日」形式にフォーマットする
  *
  * @param {Date} date - 日付

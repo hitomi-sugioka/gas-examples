@@ -36,13 +36,17 @@ if [ ! -f "$TARGET_DIR/.clasp.json" ]; then
 fi
 
 # Git情報の取得（リポジトリルートから）
-cd "$SCRIPT_DIR"
-HASH=$(git rev-parse --short HEAD)
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
 DATE=$(date +"%Y-%m-%d %H:%M")
-MSG=$(git log -1 --pretty=%s | cut -c1-60)
 
-DESC="${BRANCH}@${HASH} ${DATE} ${MSG}"
+if git -C "$SCRIPT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
+  cd "$SCRIPT_DIR"
+  HASH=$(git rev-parse --short HEAD)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  MSG=$(git log -1 --pretty=%s | cut -c1-60)
+  DESC="${BRANCH}@${HASH} ${DATE} ${MSG}"
+else
+  DESC="${DATE} (ローカルデプロイ)"
+fi
 
 PROJECT_NAME=$(basename "$TARGET_DIR")
 
