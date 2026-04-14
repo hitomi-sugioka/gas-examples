@@ -187,9 +187,14 @@ function buildGroupedEmailContent_(groupRows, col) {
 // ============================================================
 
 /**
- * 請求予定日の通知メールを送信する（トリガーから実行）
+ * 請求予定日の通知メールを送信する
  *
  * パイプライン: データ取得 → グループ化 → メール生成 → 送信
+ *
+ * ■ 実行方法
+ *   - トリガー: triggers.js の TRIGGER_CONFIGS で自動実行
+ *   - メニュー: スプレッドシートの「通知管理」→「今すぐ通知を送信（テスト）」
+ *   - clasp run: clasp run sendInvoiceNotifications
  */
 function sendInvoiceNotifications() {
   // データを取得
