@@ -1,5 +1,6 @@
 node_modules/
 .clasp.json
 creds.json
-key/
+key/*
+!key/.gitkeep
 CLAUDE.md
