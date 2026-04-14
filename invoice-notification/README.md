@@ -111,7 +111,7 @@ clasp pull
 
 ### 7. 実行可能 API としてデプロイ（clasp run を使う場合）
 
-`clasp run` を使う場合は、push 後に実行可能 API のデプロイが必要です（[手順](../README.md#実行可能-api-としてデプロイ)）。
+`clasp run` を使う場合は、事前に実行可能 API のデプロイが必要です（[手順](../README.md#実行可能-api-としてデプロイ)）。
 
 デプロイ後は `clasp run` で直接メール通知を実行できます。
 
