@@ -1,7 +1,7 @@
 /**
  * menu.js — カスタムメニュー
  *
- * スプレッドシートを開くと「請求通知」メニューが自動的に追加される。
+ * スプレッドシートを開くと「通知管理」メニューが自動的に追加される。
  * メニューから通知のテスト送信やトリガーの設定・削除を実行できる。
  *
  * ■ 関数一覧
@@ -11,12 +11,12 @@
  */
 
 /**
- * スプレッドシートを開いたときに「請求通知」メニューを追加する
+ * スプレッドシートを開いたときに「通知管理」メニューを追加する
  * Simple Trigger として GAS が自動的に呼び出す。
  */
 function onOpen() {
   SpreadsheetApp.getUi()
-    .createMenu('請求通知')
+    .createMenu('通知管理')
     .addItem('今すぐ通知を送信（テスト）', 'runManualNotification')
     .addSeparator()
     .addItem('トリガー一覧を確認', 'showTriggerStatus')
@@ -55,8 +55,22 @@ function getEventTypeLabel_(eventType) {
 }
 
 /**
+ * TRIGGER_CONFIGS から functionName に一致する config を検索する
+ * @param {string} functionName - ハンドラ関数名
+ * @return {Object|null} マッチした config、見つからなければ null
+ */
+function findTriggerConfig_(functionName) {
+  for (var i = 0; i < TRIGGER_CONFIGS.length; i++) {
+    if (TRIGGER_CONFIGS[i].functionName === functionName) {
+      return TRIGGER_CONFIGS[i];
+    }
+  }
+  return null;
+}
+
+/**
  * 設定済みトリガーの一覧をダイアログで表示する
- * TRIGGER_CONFIG にマッチするトリガーにはラベル・スケジュールを補完する。
+ * TRIGGER_CONFIGS にマッチするトリガーにはラベル・スケジュールを補完する。
  */
 function showTriggerStatus() {
   var triggers = ScriptApp.getProjectTriggers();
@@ -74,11 +88,12 @@ function showTriggerStatus() {
     var handler = trigger.getHandlerFunction();
     var eventType = trigger.getEventType().toString();
     var typeLabel = getEventTypeLabel_(eventType);
+    var config = findTriggerConfig_(handler);
 
-    if (handler === TRIGGER_CONFIG.functionName) {
-      return (i + 1) + '. ' + TRIGGER_CONFIG.label + '\n'
+    if (config) {
+      return (i + 1) + '. ' + config.label + '\n'
         + '   関数: ' + handler + '\n'
-        + '   スケジュール: 毎日 ' + TRIGGER_CONFIG.hour + '時\n'
+        + '   スケジュール: 毎日 ' + config.hour + '時\n'
         + '   種別: ' + typeLabel;
     }
 
