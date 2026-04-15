@@ -126,9 +126,9 @@ clasp run sendInvoiceNotifications
 
 以下のいずれかの方法で、`TRIGGER_CONFIGS`（`config.js`）に定義されたトリガーを一括設定します。デフォルトでは毎日 8時 / 毎週月曜 15時 に `sendInvoiceNotifications` を実行します。
 
-#### 方法 A: GAS エディタから実行
+#### 方法 A: スプレッドシートのカスタムメニューから実行
 
-GAS エディタで `setupTrigger` を手動実行します。完了ダイアログが表示されます。
+スプレッドシートを開き、「**通知管理**」メニュー →「**トリガーを設定**」を選択します。確認ダイアログで「はい」を選ぶとトリガーが一括作成されます。
 
 #### 方法 B: clasp run で実行
 
@@ -145,8 +145,10 @@ clasp run setupTriggerHeadless
 clasp run setupTriggerHeadless --params '[true]'
 ```
 
-トリガーを削除したい場合は `deleteTrigger`（GAS エディタ）または `clasp run deleteTriggerHeadless`（確認） → `clasp run deleteTriggerHeadless --params '[true]'`（実行）で削除してください。
+トリガーを削除したい場合は「**通知管理**」メニュー →「**トリガーを削除**」、または `clasp run deleteTriggerHeadless`（確認） → `clasp run deleteTriggerHeadless --params '[true]'`（実行）で削除してください。
 
+> `*Headless` 関数は `clasp run` 専用です。GAS エディタから直接実行した場合、引数を渡せないため確認モード（ドライラン）で停止します。実行ログに確認結果と操作方法の案内が表示されます。
+>
 > **注意**: トリガーの追加・変更・削除はすべてカスタムメニューまたは `clasp run` から行ってください。GAS エディタのトリガー管理画面から直接操作すると、コードで管理しているトリガーと競合し、通知の重複や削除漏れの原因になります。
 >
 > `setupTrigger` / `deleteTrigger` は `TRIGGER_CONFIGS` の `functionName` に一致するトリガーだけを操作します。GAS エディタから手動追加されたトリガーは、関数名が `TRIGGER_CONFIGS` と同じなら削除・再作成の対象になりますが、異なる関数名のトリガーは一覧（`showTriggerStatus`）に表示されるだけで、設定・削除の対象にはなりません。

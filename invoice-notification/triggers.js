@@ -333,6 +333,7 @@ function showTriggerStatusHeadless() {
   var triggers = sortTriggersByConfig_(ScriptApp.getProjectTriggers());
 
   if (triggers.length === 0) {
+    console.log('トリガーは設定されていません。');
     return { count: 0, message: 'トリガーは設定されていません' };
   }
 
@@ -357,7 +358,9 @@ function showTriggerStatusHeadless() {
     };
   });
 
-  return { count: triggers.length, triggers: list };
+  var result = { count: triggers.length, triggers: list };
+  console.log(JSON.stringify(result, null, 2));
+  return result;
 }
 
 /**
@@ -399,13 +402,20 @@ function setupTriggerHeadless(confirm) {
       return (i + 1) + '. ' + config.label
         + '（関数: ' + config.functionName + ' / ' + formatSchedule_(config) + '）';
     });
-    return {
+    var result = {
       confirm: false,
       message: '設定内容を確認してください（既存の同名トリガーは再作成されます）',
       currentTriggers: currentLines,
       planned: planned,
       next: "clasp run setupTriggerHeadless --params '[true]'"
     };
+    console.log('【確認モード】設定予定のトリガー:');
+    planned.forEach(function(line) { console.log('  ' + line); });
+    console.log('');
+    console.log('実行するには以下のいずれかを使用してください:');
+    console.log('  - clasp run setupTriggerHeadless --params \'[true]\'');
+    console.log('  - スプレッドシートの「通知管理」メニュー →「トリガーを設定」');
+    return result;
   }
 
   // 既存トリガーを一括削除してから作成（同一functionNameの複数トリガー対応）
@@ -453,13 +463,20 @@ function deleteTriggerHeadless(confirm) {
       return (i + 1) + '. ' + config.label
         + '（関数: ' + config.functionName + ' / ' + formatSchedule_(config) + '）';
     });
-    return {
+    var result = {
       confirm: false,
       message: '削除対象を確認してください',
       currentTriggers: currentLines,
       targets: targetList,
       next: "clasp run deleteTriggerHeadless --params '[true]'"
     };
+    console.log('【確認モード】削除対象のトリガー:');
+    targetList.forEach(function(line) { console.log('  ' + line); });
+    console.log('');
+    console.log('実行するには以下のいずれかを使用してください:');
+    console.log('  - clasp run deleteTriggerHeadless --params \'[true]\'');
+    console.log('  - スプレッドシートの「通知管理」メニュー →「トリガーを削除」');
+    return result;
   }
 
   // 削除実行
