@@ -1,5 +1,7 @@
 /**
- * triggers.js — トリガー設定用関数
+ * triggers.js — トリガー管理
+ *
+ * config.js の TRIGGER_CONFIGS に定義されたトリガーを一元管理する。
  *
  * ■ GAS エディタから実行する場合（メニュー / 手動実行）
  *   showTriggerStatus() — トリガー一覧表示
@@ -14,27 +16,6 @@
  * SpreadsheetApp.getUi() はヘッドレス実行で使えないため、
  * clasp run から呼ぶ場合は Headless 版を使用してください。
  */
-
-/**
- * トリガー定義（配列）
- * setupTrigger / setupTriggerHeadless はこの定義に基づいてトリガーを作成する。
- * 複数トリガーを管理したい場合はオブジェクトを追加してください。
- */
-var TRIGGER_CONFIGS = [
-  {
-    functionName: 'sendInvoiceNotifications',
-    label: '請求予定日メール通知',
-    type: 'daily',
-    hour: 8
-  },
-  {
-    functionName: 'sendInvoiceNotifications',
-    label: '請求予定日メール通知（週次）',
-    type: 'weekly',
-    hour: 15,
-    weekDay: ScriptApp.WeekDay.MONDAY
-  }
-];
 
 /**
  * トリガーのスケジュールを日本語で返す

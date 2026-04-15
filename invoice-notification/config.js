@@ -34,3 +34,24 @@ const CONFIG = {
     INVOICE_NUMBER: '請求番号',
   },
 };
+
+/**
+ * トリガー定義（配列）
+ * setupTrigger / setupTriggerHeadless はこの定義に基づいてトリガーを作成する。
+ * 複数トリガーを管理したい場合はオブジェクトを追加してください。
+ */
+var TRIGGER_CONFIGS = [
+  {
+    functionName: 'sendInvoiceNotifications',
+    label: '請求予定日メール通知',
+    type: 'daily',
+    hour: 8
+  },
+  {
+    functionName: 'sendInvoiceNotifications',
+    label: '請求予定日メール通知（週次）',
+    type: 'weekly',
+    hour: 15,
+    weekDay: ScriptApp.WeekDay.MONDAY
+  }
+];
