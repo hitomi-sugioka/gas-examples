@@ -14,6 +14,7 @@ package-lock.json
 
 # Credentials
 creds.json
+.clasprc.json
 key/
 
 # Documentation
