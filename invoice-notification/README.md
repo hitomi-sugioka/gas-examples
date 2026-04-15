@@ -124,7 +124,7 @@ clasp run sendInvoiceNotifications
 
 ### 8. トリガーを設定
 
-以下のいずれかの方法で、`TRIGGER_CONFIGS`（`triggers.js`）に定義されたトリガーを一括設定します。デフォルトでは毎日午前8時に `sendInvoiceNotifications` を実行します。
+以下のいずれかの方法で、`TRIGGER_CONFIGS`（`triggers.js`）に定義されたトリガーを一括設定します。デフォルトでは毎日 8時・15時 に `sendInvoiceNotifications` を実行します。
 
 #### 方法 A: GAS エディタから実行
 
@@ -138,11 +138,14 @@ GAS エディタで `setupTrigger` を手動実行します。完了ダイアロ
 # creds.json で認証（ステップ3 でコピー済み）
 clasp login --creds creds.json
 
-# トリガーを設定
+# 設定内容を確認（ドライラン）
 clasp run setupTriggerHeadless
+
+# 確認後、実際にトリガーを設定
+clasp run setupTriggerHeadless --params '[true]'
 ```
 
-トリガーを削除したい場合は `deleteTrigger`（GAS エディタ）または `clasp run deleteTriggerHeadless` を実行してください。
+トリガーを削除したい場合は `deleteTrigger`（GAS エディタ）または `clasp run deleteTriggerHeadless`（確認） → `clasp run deleteTriggerHeadless --params '[true]'`（実行）で削除してください。
 
 > **注意**: トリガーの追加・変更・削除はすべてカスタムメニューまたは `clasp run` から行ってください。GAS エディタのトリガー管理画面から直接操作すると、コードで管理しているトリガーと競合し、通知の重複や削除漏れの原因になります。
 
@@ -152,10 +155,10 @@ clasp run setupTriggerHeadless
 
 | メニュー項目 | 用途 |
 | --- | --- |
-| 今すぐ通知を送信（テスト） | 手動でメール通知を実行し、結果をダイアログで確認 |
-| トリガー一覧を確認 | 設定済みトリガーの関数名・種別を一覧表示 |
-| トリガーを設定 | 毎日午前8時の自動実行トリガーを作成 |
-| トリガーを削除 | 設定済みのトリガーを削除 |
+| 今すぐ通知を送信 | 手動でメール通知を実行し、結果をダイアログで確認 |
+| トリガー一覧を確認 | 設定済みトリガーのラベル・スケジュール・種別を一覧表示 |
+| トリガーを設定 | TRIGGER_CONFIGS に定義されたトリガーを一括作成（確認ダイアログあり） |
+| トリガーを削除 | 管理対象トリガーを一括削除（確認ダイアログあり） |
 
 > メニューが表示されない場合はスプレッドシートを再読み込みしてください。
 
