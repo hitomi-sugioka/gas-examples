@@ -124,7 +124,7 @@ clasp run sendInvoiceNotifications
 
 ### 8. トリガーを設定
 
-以下のいずれかの方法で、`TRIGGER_CONFIGS`（`triggers.js`）に定義されたトリガーを一括設定します。デフォルトでは毎日 8時・15時 に `sendInvoiceNotifications` を実行します。
+以下のいずれかの方法で、`TRIGGER_CONFIGS`（`triggers.js`）に定義されたトリガーを一括設定します。デフォルトでは毎日 8時 / 毎週月曜 15時 に `sendInvoiceNotifications` を実行します。
 
 #### 方法 A: GAS エディタから実行
 

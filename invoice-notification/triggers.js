@@ -29,11 +29,33 @@ var TRIGGER_CONFIGS = [
   },
   {
     functionName: 'sendInvoiceNotifications',
-    label: '請求予定日メール通知',
-    type: 'daily',
-    hour: 15
+    label: '請求予定日メール通知（週次）',
+    type: 'weekly',
+    hour: 15,
+    weekDay: ScriptApp.WeekDay.MONDAY
   }
 ];
+
+/**
+ * トリガーのスケジュールを日本語で返す
+ * @param {Object} config - TRIGGER_CONFIGS の要素
+ * @return {string} 例: '毎日 8時' / '毎週月曜 15時'
+ */
+function formatSchedule_(config) {
+  if (config.type === 'weekly') {
+    var dayLabels = {};
+    dayLabels[ScriptApp.WeekDay.MONDAY] = '月';
+    dayLabels[ScriptApp.WeekDay.TUESDAY] = '火';
+    dayLabels[ScriptApp.WeekDay.WEDNESDAY] = '水';
+    dayLabels[ScriptApp.WeekDay.THURSDAY] = '木';
+    dayLabels[ScriptApp.WeekDay.FRIDAY] = '金';
+    dayLabels[ScriptApp.WeekDay.SATURDAY] = '土';
+    dayLabels[ScriptApp.WeekDay.SUNDAY] = '日';
+    var dayLabel = dayLabels[config.weekDay] || '?';
+    return '毎週' + dayLabel + '曜 ' + config.hour + '時';
+  }
+  return '毎日 ' + config.hour + '時';
+}
 
 // ---------------------------------------------------------------------------
 // コア処理（UI 非依存）
@@ -46,13 +68,15 @@ var TRIGGER_CONFIGS = [
  * @return {Object} 作成したトリガー情報
  */
 function setupTriggerCore_(config) {
-  ScriptApp.newTrigger(config.functionName)
-    .timeBased()
-    .everyDays(1)
-    .atHour(config.hour)
-    .create();
+  var builder = ScriptApp.newTrigger(config.functionName).timeBased();
+  if (config.type === 'weekly') {
+    builder.everyWeeks(1).onWeekDay(config.weekDay);
+  } else {
+    builder.everyDays(1);
+  }
+  builder.atHour(config.hour).create();
 
-  var description = '毎日 ' + config.hour + '時';
+  var description = formatSchedule_(config);
   Logger.log(config.functionName + ' を設定しました: ' + description);
 
   return {
@@ -167,7 +191,7 @@ function showTriggerStatus() {
     if (config) {
       return (i + 1) + '. ' + config.label + '\n'
         + '   関数: ' + handler + '\n'
-        + '   スケジュール: 毎日 ' + config.hour + '時\n'
+        + '   スケジュール: ' + formatSchedule_(config) + '\n'
         + '   種別: ' + typeLabel;
     }
 
@@ -190,7 +214,7 @@ function setupTrigger() {
   var ui = SpreadsheetApp.getUi();
   var lines = TRIGGER_CONFIGS.map(function(config, i) {
     return (i + 1) + '. ' + config.label
-      + '（関数: ' + config.functionName + ' / 毎日 ' + config.hour + '時）';
+      + '（関数: ' + config.functionName + ' / ' + formatSchedule_(config) + '）';
   });
   var message = '以下のトリガーを設定します。\n\n' + lines.join('\n');
 
@@ -239,7 +263,7 @@ function deleteTrigger() {
 
   var lines = targets.map(function(config, i) {
     return (i + 1) + '. ' + config.label
-      + '（関数: ' + config.functionName + ' / 毎日 ' + config.hour + '時）';
+      + '（関数: ' + config.functionName + ' / ' + formatSchedule_(config) + '）';
   });
   var message = '以下のトリガーを削除します。\n\n' + lines.join('\n');
 
@@ -282,7 +306,7 @@ function showTriggerStatusHeadless() {
       return {
         label: config.label,
         handlerFunction: handler,
-        schedule: '毎日 ' + config.hour + '時',
+        schedule: formatSchedule_(config),
         type: typeLabel
       };
     }
@@ -314,7 +338,7 @@ function formatTriggerStatusLines_() {
 
     if (config) {
       return (i + 1) + '. ' + config.label
-        + '（関数: ' + handler + ' / 毎日 ' + config.hour + '時 / ' + typeLabel + '）';
+        + '（関数: ' + handler + ' / ' + formatSchedule_(config) + ' / ' + typeLabel + '）';
     }
     return (i + 1) + '. ' + handler + '（' + typeLabel + '）';
   });
@@ -334,7 +358,7 @@ function setupTriggerHeadless(confirm) {
     var currentLines = formatTriggerStatusLines_();
     var planned = TRIGGER_CONFIGS.map(function(config, i) {
       return (i + 1) + '. ' + config.label
-        + '（関数: ' + config.functionName + ' / 毎日 ' + config.hour + '時）';
+        + '（関数: ' + config.functionName + ' / ' + formatSchedule_(config) + '）';
     });
     return {
       confirm: false,
@@ -389,7 +413,7 @@ function deleteTriggerHeadless(confirm) {
     var currentLines = formatTriggerStatusLines_();
     var targetList = targets.map(function(config, i) {
       return (i + 1) + '. ' + config.label
-        + '（関数: ' + config.functionName + ' / 毎日 ' + config.hour + '時）';
+        + '（関数: ' + config.functionName + ' / ' + formatSchedule_(config) + '）';
     });
     return {
       confirm: false,
