@@ -74,7 +74,8 @@ function setupTriggerCore_(config) {
   } else {
     builder.everyDays(1);
   }
-  builder.atHour(config.hour).create();
+  var trigger = builder.atHour(config.hour).create();
+  saveStoredConfig_(trigger.getUniqueId(), config);
 
   var description = formatSchedule_(config);
   Logger.log(config.functionName + ' を設定しました: ' + description);
@@ -96,6 +97,7 @@ function deleteTriggerCore_(config) {
   var count = 0;
   triggers.forEach(function(trigger) {
     if (trigger.getHandlerFunction() === config.functionName) {
+      deleteStoredConfig_(trigger.getUniqueId());
       ScriptApp.deleteTrigger(trigger);
       count++;
     }
@@ -125,6 +127,46 @@ function getEventTypeLabel_(eventType) {
 }
 
 /**
+ * トリガー作成時の設定値を ScriptProperties に保存する
+ * @param {string} triggerId - trigger.getUniqueId()
+ * @param {Object} config - TRIGGER_CONFIGS の要素
+ */
+function saveStoredConfig_(triggerId, config) {
+  var snapshot = {
+    label: config.label,
+    functionName: config.functionName,
+    type: config.type,
+    hour: config.hour
+  };
+  if (config.weekDay !== undefined) {
+    snapshot.weekDay = config.weekDay;
+  }
+  var props = PropertiesService.getScriptProperties();
+  props.setProperty('trigger_' + triggerId, JSON.stringify(snapshot));
+}
+
+/**
+ * ScriptProperties から保存済み設定値を取得する
+ * @param {string} triggerId - trigger.getUniqueId()
+ * @return {Object|null}
+ */
+function getStoredConfig_(triggerId) {
+  var props = PropertiesService.getScriptProperties();
+  var json = props.getProperty('trigger_' + triggerId);
+  if (!json) return null;
+  return JSON.parse(json);
+}
+
+/**
+ * ScriptProperties から保存済み設定値を削除する
+ * @param {string} triggerId - trigger.getUniqueId()
+ */
+function deleteStoredConfig_(triggerId) {
+  var props = PropertiesService.getScriptProperties();
+  props.deleteProperty('trigger_' + triggerId);
+}
+
+/**
  * TRIGGER_CONFIGS から functionName に一致する config を検索する
  * @param {string} functionName - ハンドラ関数名
  * @return {Object|null} マッチした config、見つからなければ null
@@ -139,30 +181,50 @@ function findTriggerConfig_(functionName) {
 }
 
 /**
- * TRIGGER_CONFIGS を functionName でグルーピングしたプールを作成し、
- * match() を呼ぶたびに未消費の config を1つずつ返すマッチャーを生成する。
- * 同一 functionName で複数トリガーがある場合に、定義順でペアリングする。
- * @return {Object} match(functionName) メソッドを持つオブジェクト
+ * トリガーに対応する設定値を解決する
+ * 1. ScriptProperties の保存値（実際の設定値）を優先
+ * 2. なければ TRIGGER_CONFIGS から functionName で検索（後方互換）
+ * @param {Object} trigger - ScriptApp.getProjectTriggers() の要素
+ * @return {Object|null}
  */
-function buildConfigMatcher_() {
-  var pool = {};
-  TRIGGER_CONFIGS.forEach(function(config) {
-    if (!pool[config.functionName]) {
-      pool[config.functionName] = [];
-    }
-    pool[config.functionName].push(config);
+function resolveConfigForTrigger_(trigger) {
+  var stored = getStoredConfig_(trigger.getUniqueId());
+  if (stored) return stored;
+  return findTriggerConfig_(trigger.getHandlerFunction());
+}
+
+/**
+ * トリガー配列を TRIGGER_CONFIGS の定義順にソートする
+ * TRIGGER_CONFIGS にマッチしないトリガーは末尾に配置する。
+ * @param {Object[]} triggers - ScriptApp.getProjectTriggers() の結果
+ * @return {Object[]} ソート済みの新しい配列
+ */
+function sortTriggersByConfig_(triggers) {
+  return triggers.slice().sort(function(a, b) {
+    var configA = resolveConfigForTrigger_(a);
+    var configB = resolveConfigForTrigger_(b);
+    var indexA = configA ? findConfigIndex_(configA) : TRIGGER_CONFIGS.length;
+    var indexB = configB ? findConfigIndex_(configB) : TRIGGER_CONFIGS.length;
+    return indexA - indexB;
   });
-  var consumed = {};
-  return {
-    match: function(functionName) {
-      var configs = pool[functionName];
-      if (!configs) return null;
-      var idx = consumed[functionName] || 0;
-      if (idx >= configs.length) return null;
-      consumed[functionName] = idx + 1;
-      return configs[idx];
+}
+
+/**
+ * config が TRIGGER_CONFIGS の何番目に対応するかを返す
+ * label + functionName + type で一致判定する。
+ * @param {Object} config - resolveConfigForTrigger_ の戻り値
+ * @return {number} インデックス（見つからなければ TRIGGER_CONFIGS.length）
+ */
+function findConfigIndex_(config) {
+  for (var i = 0; i < TRIGGER_CONFIGS.length; i++) {
+    var c = TRIGGER_CONFIGS[i];
+    if (c.functionName === config.functionName
+        && c.type === config.type
+        && c.label === config.label) {
+      return i;
     }
-  };
+  }
+  return TRIGGER_CONFIGS.length;
 }
 
 /**
@@ -170,7 +232,7 @@ function buildConfigMatcher_() {
  * TRIGGER_CONFIGS にマッチするトリガーにはラベル・スケジュールを補完する。
  */
 function showTriggerStatus() {
-  var triggers = ScriptApp.getProjectTriggers();
+  var triggers = sortTriggersByConfig_(ScriptApp.getProjectTriggers());
 
   if (triggers.length === 0) {
     SpreadsheetApp.getUi().alert(
@@ -181,12 +243,11 @@ function showTriggerStatus() {
     return;
   }
 
-  var matcher = buildConfigMatcher_();
   var lines = triggers.map(function(trigger, i) {
     var handler = trigger.getHandlerFunction();
     var eventType = trigger.getEventType().toString();
     var typeLabel = getEventTypeLabel_(eventType);
-    var config = matcher.match(handler);
+    var config = resolveConfigForTrigger_(trigger);
 
     if (config) {
       return (i + 1) + '. ' + config.label + '\n'
@@ -246,11 +307,10 @@ function deleteTrigger() {
   var ui = SpreadsheetApp.getUi();
 
   // 削除対象のトリガーを収集（実トリガーと config をペアリング）
-  var triggers = ScriptApp.getProjectTriggers();
-  var matcher = buildConfigMatcher_();
+  var triggers = sortTriggersByConfig_(ScriptApp.getProjectTriggers());
   var targets = [];
   triggers.forEach(function(trigger) {
-    var config = matcher.match(trigger.getHandlerFunction());
+    var config = resolveConfigForTrigger_(trigger);
     if (config) {
       targets.push(config);
     }
@@ -289,18 +349,17 @@ function deleteTrigger() {
  * @return {Object} トリガー一覧または未設定メッセージ
  */
 function showTriggerStatusHeadless() {
-  var triggers = ScriptApp.getProjectTriggers();
+  var triggers = sortTriggersByConfig_(ScriptApp.getProjectTriggers());
 
   if (triggers.length === 0) {
     return { count: 0, message: 'トリガーは設定されていません' };
   }
 
-  var matcher = buildConfigMatcher_();
   var list = triggers.map(function(trigger) {
     var handler = trigger.getHandlerFunction();
     var eventType = trigger.getEventType().toString();
     var typeLabel = getEventTypeLabel_(eventType);
-    var config = matcher.match(handler);
+    var config = resolveConfigForTrigger_(trigger);
 
     if (config) {
       return {
@@ -326,15 +385,14 @@ function showTriggerStatusHeadless() {
  * @return {string[]} トリガー情報の文字列配列（未設定時は空配列）
  */
 function formatTriggerStatusLines_() {
-  var triggers = ScriptApp.getProjectTriggers();
+  var triggers = sortTriggersByConfig_(ScriptApp.getProjectTriggers());
   if (triggers.length === 0) return [];
 
-  var matcher = buildConfigMatcher_();
   return triggers.map(function(trigger, i) {
     var handler = trigger.getHandlerFunction();
     var eventType = trigger.getEventType().toString();
     var typeLabel = getEventTypeLabel_(eventType);
-    var config = matcher.match(handler);
+    var config = resolveConfigForTrigger_(trigger);
 
     if (config) {
       return (i + 1) + '. ' + config.label
@@ -393,11 +451,10 @@ function setupTriggerHeadless(confirm) {
  */
 function deleteTriggerHeadless(confirm) {
   // 削除対象を収集（実トリガーと config をペアリング）
-  var allTriggers = ScriptApp.getProjectTriggers();
-  var matcher = buildConfigMatcher_();
+  var allTriggers = sortTriggersByConfig_(ScriptApp.getProjectTriggers());
   var targets = [];
   allTriggers.forEach(function(trigger) {
-    var config = matcher.match(trigger.getHandlerFunction());
+    var config = resolveConfigForTrigger_(trigger);
     if (config) {
       targets.push(config);
     }
