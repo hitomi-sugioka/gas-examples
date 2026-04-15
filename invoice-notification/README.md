@@ -148,6 +148,8 @@ clasp run setupTriggerHeadless --params '[true]'
 トリガーを削除したい場合は `deleteTrigger`（GAS エディタ）または `clasp run deleteTriggerHeadless`（確認） → `clasp run deleteTriggerHeadless --params '[true]'`（実行）で削除してください。
 
 > **注意**: トリガーの追加・変更・削除はすべてカスタムメニューまたは `clasp run` から行ってください。GAS エディタのトリガー管理画面から直接操作すると、コードで管理しているトリガーと競合し、通知の重複や削除漏れの原因になります。
+>
+> `setupTrigger` / `deleteTrigger` は `TRIGGER_CONFIGS` の `functionName` に一致するトリガーだけを操作します。GAS エディタから手動追加されたトリガーは、関数名が `TRIGGER_CONFIGS` と同じなら削除・再作成の対象になりますが、異なる関数名のトリガーは一覧（`showTriggerStatus`）に表示されるだけで、設定・削除の対象にはなりません。
 
 ## カスタムメニュー
 
