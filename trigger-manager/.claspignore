@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# npm
+package.json
+package-lock.json
+
+# clasp
+.clasp.json.example
+
+# Credentials
+creds.json
+.clasprc.json
+key/
+
+# Documentation
+README.md
+CLAUDE.md

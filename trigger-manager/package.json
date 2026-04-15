@@ -1,0 +1,14 @@
+{
+  "name": "gas-trigger-manager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GAS - トリガー管理テンプレート",
+  "scripts": {
+    "push": "clasp push",
+    "deploy": "../deploy.sh ."
+  },
+  "devDependencies": {
+    "@google/clasp": "^2.4.2",
+    "@types/google-apps-script": "^1.0.83"
+  }
+}
