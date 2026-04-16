@@ -250,4 +250,4 @@ clasp run setupTriggerHeadless --params '[true]'
 
 ## 関連記事
 
-- [Google Apps Script（GAS）で予定通知メールを自動送信する方法【サンプルコード付き】](https://www.sugiokasystem.co.jp/blog/gas-auto-email-notification)
+- [GAS × スプレッドシートで期限通知メールを自動送信【コード付き】](https://www.sugiokasystem.co.jp/blog/gas-auto-email-notification)
