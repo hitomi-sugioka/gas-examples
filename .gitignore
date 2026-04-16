@@ -1,6 +1,20 @@
+# Dependencies
 node_modules/
+
+# Google Apps Script / clasp関連（機密情報）
 .clasprc.json
+**/.clasprc.json
+.clasp.json
+**/.clasp.json
+
+# 自分のサービスアカウントキー
 creds.json
-key/*
+**/*.creds.json
+key/*.json
+key/*.JSON
+
+# keyフォルダ自体は残したい場合
 !key/.gitkeep
+
+# その他
 CLAUDE.md
