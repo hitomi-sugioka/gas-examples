@@ -7,14 +7,14 @@ node_modules/
 .clasp.json
 **/.clasp.json
 
-# 自分のサービスアカウントキー
+# 自分のサービスアカウントキー（JSONだけを厳密に無視）
 creds.json
 **/*.creds.json
 key/*.json
 key/*.JSON
 
-# keyフォルダ自体は残したい場合
+# keyフォルダ自体は残したい（.gitkeepで空フォルダをGit管理）
 !key/.gitkeep
 
-# その他
+# その他（AI生成メモなど）
 CLAUDE.md
