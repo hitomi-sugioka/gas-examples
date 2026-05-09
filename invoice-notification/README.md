@@ -92,7 +92,8 @@ npm run push   # clasp push のみ
 
 > 初回 push 時に「Manifest file has been updated. Do you want to push and overwrite?」と表示されます。Yes を選択してください。
 
-初回 push 後、`clasp pull` で GAS 側のマニフェストをローカルに同期します。これにより、以降の push で上書き確認が表示されなくなり、API デプロイのバージョンを毎回更新し直す必要もなくなります。
+初回 push 後、`clasp pull` で GAS 側のマニフェストをローカルに同期します。  
+これにより、以降の push で上書き確認が表示されなくなり、API デプロイのバージョンを毎回更新し直す必要もなくなります。
 
 ```bash
 clasp pull
@@ -127,11 +128,13 @@ clasp run sendInvoiceNotifications
 
 ### Trigger Setup
 
-以下のいずれかの方法で、`TRIGGER_CONFIGS`（`config.js`）に定義されたトリガーを一括設定します。デフォルトでは毎日 8時 / 毎週月曜 15時 に `sendInvoiceNotifications` を実行します。
+以下のいずれかの方法で、`TRIGGER_CONFIGS`（`config.js`）に定義されたトリガーを一括設定します。  
+デフォルトでは毎日 8時 / 毎週月曜 15時 に `sendInvoiceNotifications` を実行します。
 
 #### Option A: Spreadsheet Custom Menu
 
-スプレッドシートを開き、「**通知管理**」メニュー →「**トリガーを設定**」を選択します。確認ダイアログで「はい」を選ぶとトリガーが一括設定されます。
+スプレッドシートを開き、「**通知管理**」メニュー →「**トリガーを設定**」を選択します。  
+確認ダイアログで「はい」を選ぶとトリガーが一括設定されます。
 
 #### Option B: clasp run
 
@@ -200,7 +203,9 @@ clasp run setupTriggerHeadless --params '[true]'
 
 ## Email Notification Example
 
-同じ請求予定日の取引先は1通のメールにまとめて送信されます。同じ取引先に複数の明細がある場合は1つのセクションにまとめます。各取引先セクションの末尾に区切り線と請求合計を表示します。
+同じ請求予定日の取引先は1通のメールにまとめて送信されます。  
+同じ取引先に複数の明細がある場合は1つのセクションにまとめます。  
+各取引先セクションの末尾に区切り線と請求合計を表示します。
 
 **件名:**
 
