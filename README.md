@@ -16,7 +16,8 @@ Google Apps Script（GAS）の実務向けサンプルコード集です。
 
 ## Getting Started
 
-最短で `clasp push` まで到達するための手順です。GCP プロジェクト設定や `clasp run`、`deploy.sh` などの詳細は [Development Environment](#development-environment) を参照してください。
+最短で `clasp push` まで到達するための手順です。  
+GCP プロジェクト設定や `clasp run`、`deploy.sh` などの詳細は [Development Environment](#development-environment) を参照してください。
 
 ### Prerequisites
 
