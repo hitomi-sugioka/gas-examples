@@ -1,16 +1,18 @@
 # invoice-notification
 
-スプレッドシートの請求予定日が近づくと、自動で通知メールを送信する Google Apps Script（GAS）のサンプルコードです。
+## Overview
+
+スプレッドシートの請求予定日が近づくと、自動で通知メールを送信する Google Apps Script（GAS）のサンプルコードです。  
 スプレッドシートで請求管理を行っている場合の通知自動化に利用できます。
 
-## 機能
+## Features
 
 - 請求予定日の **7日前・3日前・1日前・当日** にメール通知（`config.js` で変更可能）
 - 同じ請求予定日の取引先を **1通のメールにグループ化**し、同じ取引先の明細を **1セクションにまとめて請求合計を表示**
 - スプレッドシートのヘッダー名ベースでカラムを取得（列の並び替えに強い）
 - 複数の送信先・CC に対応
 
-## ファイル構成
+## File Structure
 
 | ファイル | 役割 |
 | --- | --- |
@@ -21,30 +23,31 @@
 | `triggers.js` | トリガー管理（設定・一覧・削除） |
 | `appsscript.json` | GAS マニフェスト（タイムゾーン: Asia/Tokyo） |
 
-## 前提条件
+## Prerequisites
 
-[ルートの README](../README.md#開発環境) に従って、以下の準備を行ってください。
+[ルートの README](../README.md#development-environment) に従って、以下の準備を行ってください。
 
 - Node.js・clasp のインストール
 - Apps Script API の有効化
-- [GCP プロジェクトの設定](../README.md#google-cloud-の設定)（API 有効化・GAS との紐づけ・実行可能 API デプロイ）— プロジェクトごとに必要
+- [GCP プロジェクトの設定](../README.md#google-cloud-setup)（API 有効化・GAS との紐づけ・実行可能 API デプロイ）— プロジェクトごとに必要
   - 本サンプルで必要な API: **Apps Script API**, **Google Sheets API**
 
-## セットアップ
+## Setup
 
-### 1. サンプルデータをインポート
+### 1. Import Sample Data
 
 新規スプレッドシートを作成し、`sample-data.csv` をインポートします。
 
 「ファイル」>「インポート」>「アップロード」から `sample-data.csv` を選択してください。
 
-### 2. GAS プロジェクトを作成
+### 2. Create GAS Project
 
 対象のスプレッドシートを開き、「拡張機能」>「Apps Script」で GAS プロジェクトを作成します。
 
-### 3. clasp を設定
+### 3. Configure clasp
 
-GAS エディタの **設定**（歯車アイコン）から Script ID を取得し、`.clasp.json` を作成します。
+GAS エディタの **設定**（歯車アイコン）から Script ID を取得し、`.clasp.json` を作成します。  
+key/ の取得手順はルート README の [OAuth クライアント ID の作成](../README.md#creating-oauth-client-id-for-clasp-run) を参照してください。
 
 ```bash
 # .clasp.json を作成し、scriptId を実際の値に書き換え
@@ -54,7 +57,7 @@ cp .clasp.json.example .clasp.json
 # clasp にログイン（未ログインの場合）
 clasp login
 
-# clasp run を使う場合は追加で OAuth 認証が必要（key/ の取得手順はルート README 参照）
+# clasp run を使う場合は追加で OAuth 認証が必要
 cp ../key/<ダウンロードしたファイル名>.json creds.json
 clasp login --creds creds.json
 
@@ -68,7 +71,7 @@ npm install
 > `clasp clone` は GAS からファイルをダウンロードするコマンドのため、既にローカルにソースがある本サンプルでは使いません。
 > **注意**: `.claspignore` が正しく機能するには Git リポジトリである必要があります。GitHub からダウンロード（ZIP）した場合は `git init` を実行してください。
 
-### 4. config.js を編集
+### 4. Edit config.js
 
 `config.js` を開いて以下の値を設定します。
 
@@ -77,7 +80,7 @@ npm install
 - `MAIN_RECIPIENTS` / `CC_RECIPIENTS` — メール送信先
 - `COLUMNS` — スプレッドシートのヘッダー名に合わせて修正
 
-### 5. デプロイ
+### 5. Deploy
 
 ```bash
 # リポジトリルートから
@@ -97,7 +100,7 @@ clasp pull
 
 > `clasp pull` は GAS 側の全ファイルをダウンロードしてローカルを上書きします。ローカルに未 push の変更がある場合は、先にコミットしてから実行してください。
 
-### 6. 権限を承認
+### 6. Authorize Permissions
 
 初回の push 後、GAS エディタで `sendInvoiceNotifications` を手動実行してください。「承認が必要です」ダイアログが表示されます。
 
@@ -110,27 +113,32 @@ clasp pull
 
 > この承認は初回のみ必要です。`appsscript.json` のスコープを変更して再 push した場合は、再度承認が必要になります。
 
-### 7. 実行可能 API としてデプロイ（clasp run を使う場合）
+## Usage
 
-`clasp run` を使う場合は、事前に実行可能 API のデプロイが必要です（[手順](../README.md#実行可能-api-としてデプロイ)）。
+### Run Notifications
 
-デプロイ後は `clasp run` で直接メール通知を実行できます。
+`clasp run` を使うと、ローカルから直接メール通知を実行できます（事前に [実行可能 API のデプロイ](../README.md#deploying-as-executable-api) が必要）。
 
 ```bash
 clasp run sendInvoiceNotifications
 ```
 
-### 8. トリガーを設定
+カスタムメニューから手動実行する場合は、後述の [Custom Menu](#custom-menu) を参照してください。
+
+### Trigger Setup
 
 以下のいずれかの方法で、`TRIGGER_CONFIGS`（`config.js`）に定義されたトリガーを一括設定します。デフォルトでは毎日 8時 / 毎週月曜 15時 に `sendInvoiceNotifications` を実行します。
 
-#### 方法 A: スプレッドシートのカスタムメニューから実行
+#### Option A: Spreadsheet Custom Menu
 
 スプレッドシートを開き、「**通知管理**」メニュー →「**トリガーを設定**」を選択します。確認ダイアログで「はい」を選ぶとトリガーが一括設定されます。
 
-#### 方法 B: clasp run で実行
+#### Option B: clasp run
 
-`clasp run` を使うには、事前に OAuth クライアント ID の認証情報が必要です（[取得手順](../README.md#oauth-クライアント-id-の作成clasp-run-用)）。
+`clasp run` を使うには事前準備が必要です:
+
+- 実行可能 API のデプロイ（[手順](../README.md#deploying-as-executable-api)）
+- OAuth クライアント ID の認証情報（[取得手順](../README.md#creating-oauth-client-id-for-clasp-run)）
 
 ```bash
 # creds.json で認証（ステップ3 でコピー済み）
@@ -151,7 +159,7 @@ clasp run setupTriggerHeadless --params '[true]'
 >
 > `setupTrigger` / `deleteTrigger` は `TRIGGER_CONFIGS` の `functionName` に一致するトリガーだけを操作します。GAS エディタから手動追加されたトリガーは、関数名が `TRIGGER_CONFIGS` と同じなら削除・再作成の対象になりますが、異なる関数名のトリガーは一覧（`showTriggerStatus`）に表示されるだけで、設定・削除の対象にはなりません。
 
-## カスタムメニュー
+### Custom Menu
 
 スプレッドシートを開くと「**通知管理**」メニューが自動で追加されます。
 
@@ -164,7 +172,7 @@ clasp run setupTriggerHeadless --params '[true]'
 
 > メニューが表示されない場合はスプレッドシートを再読み込みしてください。
 
-## 端数処理（丸めモード）
+## Rounding Mode
 
 請求合計は **税率ごとに税抜合計を集計し、消費税額に対して端数処理** する方式です（インボイス制度準拠）。
 
@@ -178,7 +186,7 @@ clasp run setupTriggerHeadless --params '[true]'
 
 デフォルトは **切り捨て（floor）** です。
 
-### コード側（`utils.js` の `roundAmount()`）
+### Code (`utils.js`'s `roundAmount()`)
 
 | モード | 関数 |
 | --- | --- |
@@ -186,11 +194,11 @@ clasp run setupTriggerHeadless --params '[true]'
 | 切り上げ | `Math.ceil(amount)` |
 | 四捨五入 | `Math.round(amount)` |
 
-### CSV / スプレッドシート側（`sample-data.csv`）
+### CSV / Spreadsheet (`sample-data.csv`)
 
 小計(税抜)は精度保持のため丸めません（`=E2*F2`）。表示上の丸めはスプレッドシートの書式設定で行ってください。
 
-## メール通知の例
+## Email Notification Example
 
 同じ請求予定日の取引先は1通のメールにまとめて送信されます。同じ取引先に複数の明細がある場合は1つのセクションにまとめます。各取引先セクションの末尾に区切り線と請求合計を表示します。
 
@@ -246,6 +254,6 @@ clasp run setupTriggerHeadless --params '[true]'
 請求予定表を見る: https://docs.google.com/spreadsheets/d/xxxxx/edit
 ```
 
-## 関連記事
+## Related Articles
 
 - [GAS × スプレッドシートで期限通知メールを自動送信【コード付き】](https://www.sugiokasystem.co.jp/blog/gas-auto-email-notification)
