@@ -22,6 +22,7 @@ GCP プロジェクト設定や `clasp run`、`deploy.sh` などの詳細は [De
 ### Prerequisites
 
 - Node.js v20 以上 / npm
+- [`@google/clasp`](https://github.com/google/clasp) v3.x 以降
 - [Apps Script API](https://script.google.com/home/usersettings) を **オン** にする
 
 ### Common Setup
@@ -172,7 +173,7 @@ cd invoice-notification
 npm install
 ```
 
-> `clasp clone` は GAS からファイルをダウンロードするコマンドのため、既にローカルにソースがある本サンプルでは使いません。
+> `clasp clone-script` は GAS からファイルをダウンロードするコマンドのため、既にローカルにソースがある本サンプルでは使いません。
 > **注意**: `.claspignore` が正しく機能するには Git リポジトリである必要があります。GitHub からダウンロード（ZIP）した場合は `git init` を実行してください。
 
 ### Deploy
